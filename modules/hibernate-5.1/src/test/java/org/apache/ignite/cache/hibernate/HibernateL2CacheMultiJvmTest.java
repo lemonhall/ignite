@@ -17,6 +17,7 @@
 
 package org.apache.ignite.cache.hibernate;
 
+import java.util.Map;
 import javax.persistence.Cacheable;
 import javax.persistence.Id;
 import org.apache.ignite.Ignite;
@@ -35,10 +36,13 @@ import org.hibernate.Transaction;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cache.spi.access.AccessType;
 
 import static org.apache.ignite.cache.CacheWriteSynchronizationMode.FULL_SYNC;
 import static org.apache.ignite.cache.hibernate.HibernateAccessStrategyFactory.DFLT_CACHE_NAME_PROPERTY;
 import static org.apache.ignite.cache.hibernate.HibernateL2CacheSelfTest.CONNECTION_URL;
+import static org.apache.ignite.cache.hibernate.HibernateL2CacheSelfTest.hibernateProperties;
+import static org.hibernate.cache.spi.access.AccessType.NONSTRICT_READ_WRITE;
 
 /**
  *
@@ -216,13 +220,16 @@ public class HibernateL2CacheMultiJvmTest extends GridCommonAbstractTest {
         IgniteLogger log;
 
         /**
-         * @param igniteInstanceName Name of the grid providing caches.
+         * @param nodeName Name of the grid providing caches.
          * @return Session factory.
          */
-        SessionFactory startHibernate(String igniteInstanceName) {
-            log.info("Start hibernate on node: " + igniteInstanceName);
+        SessionFactory startHibernate(String nodeName) {
+            log.info("Start hibernate on node: " + nodeName);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+
+            for (Map.Entry<String, String> e : hibernateProperties(nodeName, NONSTRICT_READ_WRITE.name()).entrySet())
+                builder.applySetting(e.getKey(), e.getValue());
 
             builder.applySetting("hibernate.connection.url", CONNECTION_URL);
             builder.applySetting(DFLT_CACHE_NAME_PROPERTY, CACHE_NAME);
