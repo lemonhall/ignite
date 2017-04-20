@@ -24,7 +24,7 @@ interested in):
         ...
         <dependency>
             <groupId>org.apache.ignite</groupId>
-            <artifactId>ignite-hibernate5</artifactId>
+            <artifactId>ignite-hibernate_5.1</artifactId>
             <version>${ignite.version}</version>
         </dependency>
         ...
