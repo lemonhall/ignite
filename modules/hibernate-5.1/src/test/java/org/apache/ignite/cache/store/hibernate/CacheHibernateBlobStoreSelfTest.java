@@ -70,8 +70,8 @@ public class CacheHibernateBlobStoreSelfTest extends
      * @throws Exception If failed.
      */
     public void testConfigurationByUrl() throws Exception {
-        URL url = U.resolveIgniteUrl(
-                "modules/hibernate/src/test/java/org/apache/ignite/cache/store/hibernate/hibernate.cfg.xml");
+        URL url = U.resolveIgniteUrl(CacheHibernateStoreFactorySelfTest.MODULE_PATH +
+            "/src/test/java/org/apache/ignite/cache/store/hibernate/hibernate.cfg.xml");
 
         assert url != null;
 
@@ -85,8 +85,8 @@ public class CacheHibernateBlobStoreSelfTest extends
      * @throws Exception If failed.
      */
     public void testConfigurationByFile() throws Exception {
-        URL url = U.resolveIgniteUrl(
-                "modules/hibernate/src/test/java/org/apache/ignite/cache/store/hibernate/hibernate.cfg.xml");
+        URL url = U.resolveIgniteUrl(CacheHibernateStoreFactorySelfTest.MODULE_PATH +
+                "/src/test/java/org/apache/ignite/cache/store/hibernate/hibernate.cfg.xml");
 
         assert url != null;
 

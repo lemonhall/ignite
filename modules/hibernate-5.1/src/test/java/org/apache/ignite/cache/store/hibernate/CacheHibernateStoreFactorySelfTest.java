@@ -51,6 +51,9 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
     /** Cache name. */
     private static final String CACHE_NAME = "test";
 
+    /** */
+    static final String MODULE_PATH = "modules/hibernate-5.1/";
+
     /**
      * @throws Exception If failed.
      */
@@ -66,8 +69,8 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
      * @throws Exception If failed.
      */
     public void testXmlConfiguration() throws Exception {
-        try (Ignite ignite = Ignition.start("modules/hibernate/src/test/config/factory-cache.xml")) {
-            try(Ignite ignite1 = Ignition.start("modules/hibernate/src/test/config/factory-cache1.xml")) {
+        try (Ignite ignite = Ignition.start(MODULE_PATH + "/src/test/config/factory-cache.xml")) {
+            try(Ignite ignite1 = Ignition.start(MODULE_PATH + "/src/test/config/factory-cache1.xml")) {
                 checkStore(ignite.<Integer, String>cache(CACHE_NAME), DummySessionFactoryExt.class);
 
                 checkStore(ignite1.<Integer, String>cache(CACHE_NAME), DummySessionFactory.class);
@@ -83,7 +86,7 @@ public class CacheHibernateStoreFactorySelfTest extends GridCommonAbstractTest {
         GridTestUtils.assertThrows(log, new Callable<Object>() {
             @Override public Object call() throws Exception {
                 try(Ignite ignite =
-                    Ignition.start("modules/hibernate/src/test/config/factory-incorrect-store-cache.xml")) {
+                    Ignition.start(MODULE_PATH + "/src/test/config/factory-incorrect-store-cache.xml")) {
                     ignite.cache(CACHE_NAME).getConfiguration(CacheConfiguration.class).
                             getCacheStoreFactory().create();
                 }
