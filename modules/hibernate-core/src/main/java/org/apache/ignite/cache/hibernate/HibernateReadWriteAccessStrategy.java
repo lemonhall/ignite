@@ -63,6 +63,7 @@ public class HibernateReadWriteAccessStrategy extends HibernateAccessStrategyAda
      * @param ignite Grid.
      * @param cache Cache.
      * @param txCtx Thread local instance used to track updates done during one Hibernate transaction.
+     * @param eConverter Exception converter.
      */
     protected HibernateReadWriteAccessStrategy(Ignite ignite,
         HibernateCacheProxy cache,
