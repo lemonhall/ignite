@@ -23,7 +23,9 @@ import java.util.Set;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCheckedException;
 import org.apache.ignite.internal.util.GridLeanSet;
+import org.apache.ignite.internal.util.tostring.GridToStringInclude;
 import org.apache.ignite.internal.util.typedef.F;
+import org.apache.ignite.internal.util.typedef.internal.S;
 
 /**
  * Implementation of NONSTRICT_READ_WRITE cache access strategy.
@@ -149,12 +151,15 @@ public class HibernateNonStrictAccessStrategy extends HibernateAccessStrategyAda
     @SuppressWarnings("TypeMayBeWeakened")
     private static class WriteContext {
         /** */
+        @GridToStringInclude
         private Map<Object, Object> updates;
 
         /** */
+        @GridToStringInclude
         private Set<Object> rmvs;
 
         /** */
+        @GridToStringInclude
         private Set<Object> locked = new GridLeanSet<>();
 
         /**
@@ -215,6 +220,11 @@ public class HibernateNonStrictAccessStrategy extends HibernateAccessStrategyAda
 
             if (!F.isEmpty(updates))
                 cache.putAll(updates);
+        }
+
+        /** {@inheritDoc} */
+        @Override public String toString() {
+            return S.toString(WriteContext.class, this);
         }
     }
 }
