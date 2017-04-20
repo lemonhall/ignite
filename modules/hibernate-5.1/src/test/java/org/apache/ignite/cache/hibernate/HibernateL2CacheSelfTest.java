@@ -68,6 +68,7 @@ import static org.apache.ignite.cache.CacheWriteSynchronizationMode.FULL_SYNC;
 import static org.apache.ignite.cache.hibernate.HibernateAccessStrategyFactory.DFLT_ACCESS_TYPE_PROPERTY;
 import static org.apache.ignite.cache.hibernate.HibernateAccessStrategyFactory.IGNITE_INSTANCE_NAME_PROPERTY;
 import static org.apache.ignite.cache.hibernate.HibernateAccessStrategyFactory.REGION_CACHE_PROPERTY;
+import static org.hibernate.cache.spi.access.AccessType.NONSTRICT_READ_WRITE;
 import static org.hibernate.cfg.Environment.CACHE_REGION_FACTORY;
 import static org.hibernate.cfg.Environment.GENERATE_STATISTICS;
 import static org.hibernate.cfg.Environment.HBM2DDL_AUTO;
@@ -1884,18 +1885,11 @@ public class HibernateL2CacheSelfTest extends GridCommonAbstractTest {
     private SessionFactory startHibernate(org.hibernate.cache.spi.access.AccessType accessType, String igniteInstanceName) {
         StandardServiceRegistryBuilder builder = registryBuilder();
 
-        builder.applySetting(HBM2DDL_AUTO, "create");
-        builder.applySetting(GENERATE_STATISTICS, "true");
-        builder.applySetting(USE_SECOND_LEVEL_CACHE, "true");
-        builder.applySetting(USE_QUERY_CACHE, "true");
-        builder.applySetting(CACHE_REGION_FACTORY, HibernateRegionFactory.class.getName());
-        builder.applySetting(RELEASE_CONNECTIONS, "on_close");
-        builder.applySetting(IGNITE_INSTANCE_NAME_PROPERTY, igniteInstanceName);
+        for (Map.Entry<String, String> e : hibernateProperties(igniteInstanceName, accessType.name()).entrySet())
+            builder.applySetting(e.getKey(), e.getValue());
+
         // Use the same cache for Entity and Entity2.
         builder.applySetting(REGION_CACHE_PROPERTY + ENTITY2_NAME, ENTITY_NAME);
-        builder.applySetting(DFLT_ACCESS_TYPE_PROPERTY, accessType.name());
-        builder.applySetting(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
-        builder.applySetting("hibernate.show_sql", false);
 
         StandardServiceRegistry srvcRegistry = builder.build();
 
@@ -1942,5 +1936,25 @@ public class HibernateL2CacheSelfTest extends GridCommonAbstractTest {
 
         for (IgniteCacheProxy<?, ?> cache : ((IgniteKernal)grid(0)).caches())
             cache.clear();
+    }
+
+    /**
+     * @param igniteInstanceName Node name.
+     * @param dfltAccessType Default cache access type.
+     * @return Properties map.
+     */
+    static Map<String, String> hibernateProperties(String igniteInstanceName, String dfltAccessType) {
+        Map<String, String> map = new HashMap<>();
+
+        map.put(HBM2DDL_AUTO, "create");
+        map.put(GENERATE_STATISTICS, "true");
+        map.put(USE_SECOND_LEVEL_CACHE, "true");
+        map.put(USE_QUERY_CACHE, "true");
+        map.put(CACHE_REGION_FACTORY, HibernateRegionFactory.class.getName());
+        map.put(RELEASE_CONNECTIONS, "on_close");
+        map.put(IGNITE_INSTANCE_NAME_PROPERTY, igniteInstanceName);
+        map.put(DFLT_ACCESS_TYPE_PROPERTY, dfltAccessType);
+
+        return map;
     }
 }

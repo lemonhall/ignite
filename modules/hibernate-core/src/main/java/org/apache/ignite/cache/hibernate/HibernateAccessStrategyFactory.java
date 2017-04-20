@@ -33,7 +33,7 @@ import org.apache.ignite.internal.util.typedef.G;
 import static org.apache.ignite.cache.CacheAtomicityMode.TRANSACTIONAL;
 
 /**
- *
+ * Access strategy factory.
  */
 public class HibernateAccessStrategyFactory {
     /** */

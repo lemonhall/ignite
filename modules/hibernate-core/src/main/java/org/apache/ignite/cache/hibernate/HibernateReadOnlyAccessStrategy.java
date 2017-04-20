@@ -47,7 +47,6 @@ import org.apache.ignite.IgniteCheckedException;
  * &#064;org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
  * public class Entity { ... }
  * </pre>
-
  *
  */
 public class HibernateReadOnlyAccessStrategy extends HibernateAccessStrategyAdapter {

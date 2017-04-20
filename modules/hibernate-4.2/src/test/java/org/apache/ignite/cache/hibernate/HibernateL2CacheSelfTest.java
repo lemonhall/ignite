@@ -495,24 +495,11 @@ public class HibernateL2CacheSelfTest extends GridCommonAbstractTest {
         cfg.setCacheConcurrencyStrategy(PARENT_ENTITY_NAME, accessType.getExternalName());
         cfg.setCollectionCacheConcurrencyStrategy(CHILD_COLLECTION_REGION, accessType.getExternalName());
 
-        cfg.setProperty(HBM2DDL_AUTO, "create");
-
-        cfg.setProperty(GENERATE_STATISTICS, "true");
-
-        cfg.setProperty(USE_SECOND_LEVEL_CACHE, "true");
-
-        cfg.setProperty(USE_QUERY_CACHE, "true");
-
-        cfg.setProperty(CACHE_REGION_FACTORY, HibernateRegionFactory.class.getName());
-
-        cfg.setProperty(RELEASE_CONNECTIONS, "on_close");
-
-        cfg.setProperty(IGNITE_INSTANCE_NAME_PROPERTY, igniteInstanceName);
+        for (Map.Entry<String, String> e : hibernateProperties(igniteInstanceName, accessType.name()).entrySet())
+            cfg.setProperty(e.getKey(), e.getValue());
 
         // Use the same cache for Entity and Entity2.
         cfg.setProperty(REGION_CACHE_PROPERTY + ENTITY2_NAME, ENTITY_NAME);
-
-        cfg.setProperty(DFLT_ACCESS_TYPE_PROPERTY, accessType.name());
 
         return cfg;
     }
@@ -1943,5 +1930,25 @@ public class HibernateL2CacheSelfTest extends GridCommonAbstractTest {
 
         for (IgniteCacheProxy<?, ?> cache : ((IgniteKernal)grid(0)).caches())
             cache.clear();
+    }
+
+    /**
+     * @param igniteInstanceName Node name.
+     * @param dfltAccessType Default cache access type.
+     * @return Properties map.
+     */
+    static Map<String, String> hibernateProperties(String igniteInstanceName, String dfltAccessType) {
+        Map<String, String> map = new HashMap<>();
+
+        map.put(HBM2DDL_AUTO, "create");
+        map.put(GENERATE_STATISTICS, "true");
+        map.put(USE_SECOND_LEVEL_CACHE, "true");
+        map.put(USE_QUERY_CACHE, "true");
+        map.put(CACHE_REGION_FACTORY, HibernateRegionFactory.class.getName());
+        map.put(RELEASE_CONNECTIONS, "on_close");
+        map.put(IGNITE_INSTANCE_NAME_PROPERTY, igniteInstanceName);
+        map.put(DFLT_ACCESS_TYPE_PROPERTY, dfltAccessType);
+
+        return map;
     }
 }

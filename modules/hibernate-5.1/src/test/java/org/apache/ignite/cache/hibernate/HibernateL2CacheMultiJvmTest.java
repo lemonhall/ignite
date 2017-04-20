@@ -17,7 +17,6 @@
 
 package org.apache.ignite.cache.hibernate;
 
-import java.util.Map;
 import javax.persistence.Cacheable;
 import javax.persistence.Id;
 import org.apache.ignite.Ignite;
@@ -34,14 +33,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import static org.apache.ignite.cache.CacheWriteSynchronizationMode.FULL_SYNC;
 import static org.apache.ignite.cache.hibernate.HibernateAccessStrategyFactory.DFLT_CACHE_NAME_PROPERTY;
 import static org.apache.ignite.cache.hibernate.HibernateL2CacheSelfTest.CONNECTION_URL;
-import static org.apache.ignite.cache.hibernate.HibernateL2CacheSelfTest.hibernateProperties;
-import static org.hibernate.cache.spi.access.AccessType.NONSTRICT_READ_WRITE;
 
 /**
  *
@@ -225,32 +222,18 @@ public class HibernateL2CacheMultiJvmTest extends GridCommonAbstractTest {
         SessionFactory startHibernate(String igniteInstanceName) {
             log.info("Start hibernate on node: " + igniteInstanceName);
 
-            Configuration cfg = hibernateConfiguration(igniteInstanceName);
-
-            ServiceRegistryBuilder builder = new ServiceRegistryBuilder();
+            StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
 
             builder.applySetting("hibernate.connection.url", CONNECTION_URL);
+            builder.applySetting(DFLT_CACHE_NAME_PROPERTY, CACHE_NAME);
 
-            return cfg.buildSessionFactory(builder.buildServiceRegistry());
-        }
+            MetadataSources metadataSources = new MetadataSources(builder.build());
 
-        /**
-         * @param nodeName Ignite instance name.
-         * @return Hibernate configuration.
-         */
-        private Configuration hibernateConfiguration(String nodeName) {
-            Configuration cfg = new Configuration();
+            metadataSources.addAnnotatedClass(Entity1.class);
+            metadataSources.addAnnotatedClass(Entity2.class);
+            metadataSources.addAnnotatedClass(Entity3.class);
 
-            cfg.addAnnotatedClass(Entity1.class);
-            cfg.addAnnotatedClass(Entity2.class);
-            cfg.addAnnotatedClass(Entity3.class);
-
-            for (Map.Entry<String, String> e : hibernateProperties(nodeName, NONSTRICT_READ_WRITE.name()).entrySet())
-                cfg.setProperty(e.getKey(), e.getValue());
-
-            cfg.setProperty(DFLT_CACHE_NAME_PROPERTY, CACHE_NAME);
-
-            return cfg;
+            return metadataSources.buildMetadata().buildSessionFactory();
         }
     }
 

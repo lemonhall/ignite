@@ -23,6 +23,7 @@ package org.apache.ignite.cache.hibernate;
 public interface HibernateKeyTransformer {
     /**
      * @param key Hibernate key.
+     * @return Transformed key.
      */
     public Object transform(Object key);
 }
